@@ -57,6 +57,7 @@ public class FileUtils {
 
     public static final String POSTFIX = ".JPEG";
     public static final String POST_VIDEO = ".mp4";
+    public static final String POST_AUDIO = ".mp3";
     public static final String APP_NAME = "ImageSelector";
     public static final String CAMERA_PATH = "/" + APP_NAME + "/CameraImage/";
     public static final String CROP_PATH = "/" + APP_NAME + "/CropImage/";
@@ -87,6 +88,9 @@ public class FileUtils {
                 break;
             case 2:
                 tmpFile = new File(folderDir, fileName + POST_VIDEO);
+                break;
+            case 3:
+                tmpFile = new File(folderDir, fileName + POST_AUDIO);
                 break;
         }
         return tmpFile;

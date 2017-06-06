@@ -12,6 +12,7 @@ import java.io.Serializable;
 public class FunctionConfig implements Serializable {
     public static final int TYPE_IMAGE = 1;
     public static final int TYPE_VIDEO = 2;
+    public static final int TYPE_AUDIO = 3;
 
     // 裁剪模式
     public static final int CROP_MODEL_DEFAULT = 0;

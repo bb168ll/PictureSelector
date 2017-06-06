@@ -86,6 +86,9 @@ public class PictureAlbumDirectoryActivity extends PictureBaseActivity implement
             case FunctionConfig.TYPE_VIDEO:
                 picture_tv_title.setText(getString(R.string.picture_select_video));
                 break;
+            case FunctionConfig.TYPE_AUDIO:
+                picture_tv_title.setText(getString(R.string.picture_select_audio));
+                break;
             default:
                 break;
         }

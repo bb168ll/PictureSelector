@@ -158,6 +158,13 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="15sp"
                     android:text="获取视频" />
+
+                <RadioButton
+                    android:id="@+id/rb_audio"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="15sp"
+                    android:text="获取音频" />
             </RadioGroup>
 
             <RadioGroup

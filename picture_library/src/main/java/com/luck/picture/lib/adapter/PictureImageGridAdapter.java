@@ -136,6 +136,11 @@ public class PictureImageGridAdapter extends RecyclerView.Adapter<RecyclerView.V
                     }
                 }
             });
+
+            if (type == FunctionConfig.TYPE_AUDIO) {
+                ((ImageView) headerHolder.headerView.findViewById(R.id.camera)).setImageResource(R.drawable.soundrecorder);
+                ((TextView) headerHolder.headerView.findViewById(R.id.tv_take)).setText(R.string.picture_take_audio);
+            }
         } else {
             final ViewHolder contentHolder = (ViewHolder) holder;
             final LocalMedia image = images.get(showCamera ? position - 1 : position);
@@ -162,7 +167,16 @@ public class PictureImageGridAdapter extends RecyclerView.Adapter<RecyclerView.V
                     contentHolder.tv_duration.setVisibility(View.VISIBLE);
                 }
                 contentHolder.tv_duration.setText(timeParse(duration));
-
+            } else if (type == FunctionConfig.TYPE_AUDIO) {
+//                Glide.with(context).load(path).diskCacheStrategy(DiskCacheStrategy.RESULT).crossFade()
+//                        .centerCrop().override(150, 150).into(contentHolder.picture);
+                long duration = image.getDuration();
+                if (contentHolder.tv_duration.getVisibility() == View.GONE) {
+                    contentHolder.tv_duration.setVisibility(View.VISIBLE);
+                }
+                contentHolder.tv_duration.setText(timeParse(duration));
+                contentHolder.picture.setImageResource(R.drawable.music);
+                contentHolder.contentView.setBackgroundResource(android.R.color.holo_blue_light);
             } else {
                 DiskCacheStrategy result;
                 if (isGif) {
@@ -199,6 +213,9 @@ public class PictureImageGridAdapter extends RecyclerView.Adapter<RecyclerView.V
                         int index = showCamera ? position - 1 : position;
                         imageSelectChangedListener.onPictureClick(image, index);
                     } else if (type == FunctionConfig.TYPE_IMAGE && (selectMode == FunctionConfig.MODE_SINGLE || enablePreview) && imageSelectChangedListener != null) {
+                        int index = showCamera ? position - 1 : position;
+                        imageSelectChangedListener.onPictureClick(image, index);
+                    } else if (type == FunctionConfig.TYPE_AUDIO && (selectMode == FunctionConfig.MODE_SINGLE || enablePreviewVideo) && imageSelectChangedListener != null) {
                         int index = showCamera ? position - 1 : position;
                         imageSelectChangedListener.onPictureClick(image, index);
                     } else {

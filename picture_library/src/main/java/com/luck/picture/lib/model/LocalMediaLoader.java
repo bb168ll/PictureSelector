@@ -1,5 +1,6 @@
 package com.luck.picture.lib.model;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -18,6 +19,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+
+import static android.Manifest.permission.RECORD_AUDIO;
 
 
 /**
@@ -45,6 +48,23 @@ public class LocalMediaLoader {
             MediaStore.Video.Media.DATE_ADDED,
             MediaStore.Video.Media._ID,
             MediaStore.Video.Media.DURATION,
+    };
+
+    private final static String[] AUDIO_PROJECTION = {
+            MediaStore.Audio.Media.DATA,                //音频文件的实际路径
+            MediaStore.Audio.Media.DISPLAY_NAME,
+            MediaStore.Audio.Media.DATE_ADDED,
+            MediaStore.Audio.Media._ID,                 //内部ID
+            MediaStore.Audio.Media.DURATION,
+
+            MediaStore.Audio.Media.TITLE,
+            MediaStore.Audio.Media.MIME_TYPE,
+            MediaStore.Audio.Media.ARTIST,//艺术家
+            MediaStore.Audio.Media.ALBUM,//唱片集
+            MediaStore.Audio.Media.IS_RINGTONE,
+            MediaStore.Audio.Media.IS_ALARM,
+            MediaStore.Audio.Media.IS_MUSIC,
+            MediaStore.Audio.Media.IS_NOTIFICATION
     };
 
     private int type = FunctionConfig.TYPE_IMAGE;
@@ -94,7 +114,22 @@ public class LocalMediaLoader {
                     cursorLoader = new CursorLoader(
                             activity, MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
                             VIDEO_PROJECTION, selection, selectionArgs, VIDEO_PROJECTION[2] + " DESC");
+                } else if (id == FunctionConfig.TYPE_AUDIO) {
+                    String selection;
+                    String selectionArgs[];
+                    if (videoS <= 0) {
+                        selection = null;
+                        selectionArgs = null;
+                    } else {
+                        selection = "duration <= ?";
+                        selectionArgs = new String[]{String.valueOf(videoS)};
+                    }
+
+                    cursorLoader = new CursorLoader(
+                            activity, MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                            AUDIO_PROJECTION, selection, selectionArgs, AUDIO_PROJECTION[2] + " DESC");
                 }
+
                 return cursorLoader;
             }
 
@@ -117,7 +152,14 @@ public class LocalMediaLoader {
                                     continue;
                                 }
                                 long dateTime = data.getLong(data.getColumnIndexOrThrow(IMAGE_PROJECTION[2]));
-                                int duration = (type == FunctionConfig.TYPE_VIDEO ? data.getInt(data.getColumnIndexOrThrow(VIDEO_PROJECTION[4])) : 0);
+                                int duration = 0;
+
+                                if (type == FunctionConfig.TYPE_VIDEO) {
+                                    duration = data.getInt(data.getColumnIndexOrThrow(VIDEO_PROJECTION[4]));
+                                } else if (type == FunctionConfig.TYPE_AUDIO) {
+                                    duration = data.getInt(data.getColumnIndexOrThrow(AUDIO_PROJECTION[4]));
+                                }
+
                                 LocalMedia image = new LocalMedia(path, dateTime, duration, type);
                                 LocalMediaFolder folder = getImageFolder(path, imageFolders);
                                 folder.getImages().add(image);
@@ -143,6 +185,9 @@ public class LocalMediaLoader {
                                         break;
                                     case FunctionConfig.TYPE_IMAGE:
                                         title = activity.getString(R.string.picture_lately_image);
+                                        break;
+                                    case FunctionConfig.TYPE_AUDIO:
+                                        title = activity.getString(R.string.picture_lately_audio);
                                         break;
                                 }
                                 allImageFolder.setFirstImagePath(latelyImages.get(0).getPath());

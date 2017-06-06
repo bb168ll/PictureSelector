@@ -36,7 +36,7 @@ import java.util.List;
  */
 
 public class MainActivity extends Activity implements RadioGroup.OnCheckedChangeListener, View.OnClickListener {
-    public static final String TAG = "MainActivity";
+    public static final String TAG = "MusicPlayActivity";
     private RecyclerView recyclerView;
     private GridImageAdapter adapter;
     private RadioGroup rgbs, rgbs01, rgbs0, rgbs1, rgbs2, rgbs3, rgbs4, rgbs5, rgbs6, rgbs7, rgbs8, rgbs9, rgbs10, rgbs11;
@@ -128,13 +128,18 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
                 switch (selectType) {
                     case FunctionConfig.TYPE_IMAGE:
                         // 预览图片 可长按保存 也可自定义保存路径
-                        //PictureConfig.getInstance().externalPicturePreview(MainActivity.this, "/custom_file", position, selectMedia);
+                        //PictureConfig.getInstance().externalPicturePreview(MusicPlayActivity.this, "/custom_file", position, selectMedia);
                         PictureConfig.getInstance().externalPicturePreview(MainActivity.this, position, selectMedia);
                         break;
                     case FunctionConfig.TYPE_VIDEO:
                         // 预览视频
                         if (selectMedia.size() > 0) {
                             PictureConfig.getInstance().externalPictureVideo(MainActivity.this, selectMedia.get(position).getPath());
+                        }
+                        break;
+                    case FunctionConfig.TYPE_AUDIO:
+                        if (selectMedia.size() > 0) {
+                            PictureConfig.getInstance().externalPictureAudio(MainActivity.this, selectMedia.get(position).getPath());
                         }
                         break;
                 }
@@ -268,10 +273,10 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
                             .setFreeStyleCrop(false) // 裁剪是移动矩形框或是图片
 //                            .setRotateEnabled(false) // 裁剪时是否旋转图片
 //                            .setScaleEnabled(false)// 裁剪时是否放大小图片
-//                            .setPicture_title_color(ContextCompat.getColor(MainActivity.this, R.color.black)) // 设置标题字体颜色
-//                            .setPicture_right_color(ContextCompat.getColor(MainActivity.this, R.color.black)) // 设置标题右边字体颜色
+//                            .setPicture_title_color(ContextCompat.getColor(MusicPlayActivity.this, R.color.black)) // 设置标题字体颜色
+//                            .setPicture_right_color(ContextCompat.getColor(MusicPlayActivity.this, R.color.black)) // 设置标题右边字体颜色
 //                            .setLeftBackDrawable(R.mipmap.back2) // 设置返回键图标
-//                            .setStatusBar(ContextCompat.getColor(MainActivity.this, R.color.white)) // 设置状态栏颜色，默认是和标题栏一致
+//                            .setStatusBar(ContextCompat.getColor(MusicPlayActivity.this, R.color.white)) // 设置状态栏颜色，默认是和标题栏一致
 //                            .setImmersive(false)// 是否改变状态栏字体颜色(黑色)
                             .create();
 
@@ -380,6 +385,9 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
                 break;
             case R.id.rb_video:
                 selectType = FunctionConfig.TYPE_VIDEO;
+                break;
+            case R.id.rb_audio:
+                selectType = FunctionConfig.TYPE_AUDIO;
                 break;
             case R.id.rb_photo_display:
                 isShow = true;

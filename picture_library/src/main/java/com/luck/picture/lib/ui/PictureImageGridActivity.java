@@ -2,6 +2,7 @@ package com.luck.picture.lib.ui;
 
 import android.Manifest;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.AudioManager;
@@ -182,7 +183,7 @@ public class PictureImageGridActivity extends PictureBaseActivity implements Vie
             images = ImagesObservable.getInstance().readLocalMedias();
 
             if (enablePreview && selectMode == FunctionConfig.MODE_MULTIPLE) {
-                if (type == FunctionConfig.TYPE_VIDEO) {
+                if (type == FunctionConfig.TYPE_VIDEO || type == FunctionConfig.TYPE_AUDIO) {
                     // 如果是视频不能预览
                     id_preview.setVisibility(View.GONE);
                 } else {
@@ -202,6 +203,9 @@ public class PictureImageGridActivity extends PictureBaseActivity implements Vie
                         break;
                     case FunctionConfig.TYPE_VIDEO:
                         picture_tv_title.setText(getString(R.string.picture_lately_video));
+                        break;
+                    case FunctionConfig.TYPE_AUDIO:
+                        picture_tv_title.setText(getString(R.string.picture_lately_audio));
                         break;
                 }
             }
@@ -347,6 +351,9 @@ public class PictureImageGridActivity extends PictureBaseActivity implements Vie
                         case FunctionConfig.TYPE_VIDEO:
                             showToast(getString(R.string.picture_min_video_num, options.getMinSelectNum()));
                             return;
+                        case FunctionConfig.TYPE_AUDIO:
+                            showToast(getString(R.string.picture_min_audio_num, options.getMinSelectNum()));
+                            return;
                         default:
                             break;
                     }
@@ -430,6 +437,10 @@ public class PictureImageGridActivity extends PictureBaseActivity implements Vie
                     // 录视频
                     startOpenCameraVideo();
                     break;
+                case FunctionConfig.TYPE_AUDIO:
+                    // 录视频
+                    startOpenAudio();
+                    break;
             }
         }
     }
@@ -476,6 +487,7 @@ public class PictureImageGridActivity extends PictureBaseActivity implements Vie
                 }
                 break;
             case FunctionConfig.TYPE_VIDEO:
+            case FunctionConfig.TYPE_AUDIO:
                 // 视频
                 if (selectMode == FunctionConfig.MODE_SINGLE) {
                     // 单选
@@ -492,7 +504,11 @@ public class PictureImageGridActivity extends PictureBaseActivity implements Vie
                     }
                     bundle.putString("video_path", media.getPath());
                     bundle.putSerializable(FunctionConfig.EXTRA_THIS_CONFIG, options);
-                    startActivity(PictureVideoPlayActivity.class, bundle);
+                    if (type == FunctionConfig.TYPE_VIDEO) {
+                        startActivity(PictureVideoPlayActivity.class, bundle);
+                    } else {
+                        startActivity(MusicPlayActivity.class, bundle);
+                    }
                 }
                 break;
         }
@@ -669,12 +685,39 @@ public class PictureImageGridActivity extends PictureBaseActivity implements Vie
         }
     }
 
+    public void startOpenAudio() {
+        Intent cameraIntent = new Intent(MediaStore.Audio.Media.RECORD_SOUND_ACTION);
+        if (cameraIntent.resolveActivity(getPackageManager()) != null) {
+            cameraIntent.putExtra(MediaStore.EXTRA_DURATION_LIMIT, recordVideoSecond);
+            startActivityForResult(cameraIntent, FunctionConfig.REQUEST_CAMERA);
+        }
+    }
+
+
+    private String uriToPath(Uri uri) {
+        String path = null;
+        Cursor cursor = getContentResolver().query(uri, null, null, null, null);
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                path = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
+            }
+
+            cursor.close();
+        }
+        return path;
+    }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
             // on take photo success
             if (requestCode == FunctionConfig.REQUEST_CAMERA) {
+                // on audio
+                if (type == FunctionConfig.TYPE_AUDIO) {
+                    cameraPath = uriToPath(data.getData());
+                }
+
                 // 拍照返回
                 File file = new File(cameraPath);
                 int degree = FileUtils.readPictureDegree(file.getAbsolutePath());
@@ -718,7 +761,7 @@ public class PictureImageGridActivity extends PictureBaseActivity implements Vie
                 } else {
                     // 多选 返回列表并选中当前拍照的
                     int duration = 0;
-                    if (type == FunctionConfig.TYPE_VIDEO) {
+                    if (type == FunctionConfig.TYPE_VIDEO || type == FunctionConfig.TYPE_AUDIO) {
                         MediaMetadataRetriever mmr = new MediaMetadataRetriever();
                         mmr.setDataSource(file.getPath());
                         duration = Integer.parseInt(mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION));
@@ -816,6 +859,9 @@ public class PictureImageGridActivity extends PictureBaseActivity implements Vie
                     break;
                 case FunctionConfig.TYPE_VIDEO:
                     folderName = getString(R.string.picture_lately_video);
+                    break;
+                case FunctionConfig.TYPE_AUDIO:
+                    folderName = getString(R.string.picture_lately_audio);
                     break;
             }
             newFolder.setName(folderName);

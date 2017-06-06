@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 
 import com.luck.picture.lib.R;
+import com.luck.picture.lib.ui.MusicPlayActivity;
 import com.luck.picture.lib.ui.PictureExternalPreviewActivity;
 import com.luck.picture.lib.ui.PictureImageGridActivity;
 import com.luck.picture.lib.ui.PictureVideoPlayActivity;
@@ -126,6 +127,21 @@ public class PictureConfig {
             Intent intent = new Intent();
             intent.putExtra("video_path", path);
             intent.setClass(activity, PictureVideoPlayActivity.class);
+            activity.startActivity(intent);
+        }
+    }
+
+    /**
+     * 外部音频播放
+     *
+     * @param activity
+     * @param path
+     */
+    public void externalPictureAudio(Activity activity, String path) {
+        if (!Utils.isNull(path)) {
+            Intent intent = new Intent();
+            intent.putExtra("video_path", path);
+            intent.setClass(activity, MusicPlayActivity.class);
             activity.startActivity(intent);
         }
     }

@@ -18,6 +18,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.lang.System.load;
+
 /**
  * author：luck
  * project：LeTuGolf
@@ -166,6 +168,11 @@ public class GridImageAdapter extends
                     // 视频
                     Log.i("时长:", media.getDuration() + "");
                     Glide.with(viewHolder.itemView.getContext()).load(path).thumbnail(0.5f).into(viewHolder.mImg);
+                    break;
+                case 3:
+                    // 音频
+                    Log.i("时长:", media.getDuration() + "");
+                    viewHolder.mImg.setImageResource(R.drawable.music);
                     break;
                 default:
 
